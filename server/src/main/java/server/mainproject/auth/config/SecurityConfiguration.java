@@ -25,6 +25,7 @@ import server.mainproject.auth.handler.MemberAuthenticationEntryPoint;
 import server.mainproject.auth.handler.MemberAuthenticationFailureHandler;
 import server.mainproject.auth.handler.MemberAuthenticationSuccessHandler;
 import server.mainproject.auth.jwt.JwtTokenizer;
+import server.mainproject.auth.refresh.RefreshTokenController;
 import server.mainproject.auth.utils.CustomAuthorityUtils;
 import server.mainproject.auth.utils.JwtUtils;
 import server.mainproject.member.repository.MemberRepository;
@@ -46,6 +47,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     private final MemberRepository memberRepository;
 
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -55,6 +57,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 .cors(httpSecurityCorsConfigurer -> corsConfigurationSource())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+//                .formLogin().permitAll()
                 .formLogin().disable()
                 .httpBasic().disable()
                 .exceptionHandling()
@@ -121,7 +124,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
 
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtUtils(), authorityUtils);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtUtils(), authorityUtils,jwtTokenizer(),memberRepository);
 
             builder.addFilter(jwtAuthenticationFilter).addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
 

@@ -56,12 +56,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws ServletException, IOException {
 
-
         Member member = (Member) authResult.getPrincipal();
         String accessToken = delegateAccessToken(member);
         String refreshToken = delegateRefreshToken(member);
-
-
 
         Long memberId = member.getMemberId();
 
@@ -75,39 +72,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String Authorization = "Bearer_" + accessToken;
         String refresh = "Bearer_" + refreshToken;
 
-        Cookie cookie1 = new Cookie("Authorization", Authorization);
-        Cookie cookie2 = new Cookie("Refresh", refresh);
-        Cookie cookie3 = new Cookie("memberId", String.valueOf(memberId));
-//        Cookie cookie4 = new Cookie("userName", userName);
-
-        cookie1.setHttpOnly(true);
-        cookie2.setHttpOnly(true);
-        cookie3.setHttpOnly(true);
-//        cookie4.setHttpOnly(true);
-
-        cookie1.setPath("/");
-        cookie2.setPath("/");
-        cookie3.setPath("/");
-//        cookie4.setPath("/");
-
-//        cookie1.setMaxAge(3600);
-//        cookie2.setMaxAge(3600);
-//        cookie3.setMaxAge(3600);
-//        cookie4.setMaxAge(3600);
-
-//        cookie1.setDomain("localhost");
-        cookie1.setDomain("mainmay.s3-website.ap-northeast-2.amazonaws.com");
-//        cookie2.setDomain("localhost");
-        cookie2.setDomain("mainmay.s3-website.ap-northeast-2.amazonaws.com");
-//        cookie3.setDomain("localhost");
-        cookie3.setDomain("mainmay.s3-website.ap-northeast-2.amazonaws.com");
-
-//
-        response.addCookie(cookie1);
-        response.addCookie(cookie2);
-        response.addCookie(cookie3);
-//        response.addCookie(cookie4);
-
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("memberId", memberId);
         jsonObject.put("userName", userName);
@@ -115,14 +79,34 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         jsonObject.put("accessToken", Authorization);
         jsonObject.put("refreshToken", refresh);
 
-
         // 응답 헤더 설정
         response.setContentType("application/json");
 
         // 응답 데이터 전송
         response.getWriter().write(jsonObject.toString());
-
+//
         this.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);  // 추가
+
+        Cookie cookie1 = new Cookie("Authorization", Authorization);
+        Cookie cookie2 = new Cookie("Refresh", refresh);
+        Cookie cookie3 = new Cookie("memberId", String.valueOf(memberId));
+
+        cookie1.setHttpOnly(true);
+        cookie2.setHttpOnly(true);
+        cookie3.setHttpOnly(true);
+
+        cookie1.setPath("/");
+        cookie2.setPath("/");
+        cookie3.setPath("/");
+
+        cookie1.setDomain("mainmay.s3-website.ap-northeast-2.amazonaws.com");
+        cookie2.setDomain("mainmay.s3-website.ap-northeast-2.amazonaws.com");
+        cookie3.setDomain("mainmay.s3-website.ap-northeast-2.amazonaws.com");
+
+        response.addCookie(cookie1);
+        response.addCookie(cookie2);
+        response.addCookie(cookie3);
+
     }
 
     public String delegateAccessToken(Member member) {
